@@ -2,36 +2,58 @@ import numpy as np
 import cv2 as cv
 import scipy.ndimage as ndi
 
-img = cv.imread("Assets/overhead_parking.png")
-gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-smooth = ndi.median_filter(gray, size=2)
-edges = cv.Canny(gray, 100, 150)
+
+def process(image):
+    lower = np.uint8([120, 120, 120])
+    upper = np.uint8([255, 255, 255])
+    white_mask = cv.inRange(image, lower, upper)
+    # yellow color mask
+    lower = np.uint8([190, 190, 0])
+    upper = np.uint8([255, 255, 255])
+    yellow_mask = cv.inRange(image, lower, upper)
+    # combine the mask
+    mask = cv.bitwise_or(white_mask, yellow_mask)
+    masked = cv.bitwise_and(image, image, mask=mask)
+
+    # convert to grayscale
+    gray = cv.cvtColor(masked, cv.COLOR_RGB2GRAY)
+
+    # detect edges using Canny Method then straight lines using Hough Lines Probablistic
+    lines = cv.HoughLinesP(
+        (cv.Canny(image, 50, 200)),
+        rho=0.1,
+        theta=np.pi / 10,
+        threshold=130,
+        maxLineGap=5,
+        minLineLength=6,
+    )
+
+    # draw the lines on a copy of the image
+
+    new_img = np.copy(image)
+    lines_list = []
+
+    for points in lines:
+        x, y, x1, y1 = points[0]
+        cv.line(new_img, (x, y), (x1, y1), (0, 0, 255), 2)
+
+        lines_list.append([(x, y), (x1, y1)])
+
+    return new_img
+
+
+# MAIN
+image = cv.imread("Assets/overhead_parking.png")
+# image = cv.imread("Assets/overhead_parking.png")
 
 
 while True:
-    # for x in lines:
-    #     for rho, theta in x:
-    #         # print(rho, theta)
-    #         a = np.cos(theta)
-    #         b = np.sin(theta)
-    #         x0 = a * rho
-    #         y0 = b * rho
-    #         x1 = int(x0 + 1000 * (-b))
-    #         y1 = int(y0 + 1000 * (a))
-    #         x2 = int(x0 - 1000 * (-b))
-    #         y2 = int(y0 - 1000 * (a))
-
-    #         cv.line(img, (x1, y1), (x2, y2), (0, 0, 255), 2)
-    #         cv.imshow("Grayscale", img)
-
-    # cv.imshow("Smooth", smooth)
-    cv.imshow("edges", edges)
-    # cv.imshow("Original", img)
+    cv.imshow("Processed", process(image))
 
     key = cv.waitKey(1)
 
     if key == 27:
         break
-# Show the result
-# cv.imshow("Line Detection", img)
+
+
 cv.destroyAllWindows()
