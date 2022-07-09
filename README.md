@@ -3,6 +3,7 @@
 1. Parking Slot Identification.
    - Use manual Segmentation to mark Regions of Intrest.(Parking slots)
    - Upgrade to Image based Segmentation using Active Contours
+   - Canny edge detection was used to detect the straight lines in parking lots.
 2. Car Detection.
    - Define a vehicle using 4 bounds.-[MASK RCNN]
    - Object Classification. (Cars must be distinguishable from other objects)
