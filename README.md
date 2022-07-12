@@ -11,3 +11,14 @@
    - A slot's status is updated in memory.
    - Parking lot status(Current Car count vs Total available slots)
    - Directions to available space as a feature.
+
+## Manual Segmentation
+
+- Segmentor.py is used to manually select parking slots in a video feed.
+- The cars will then be identified using Mask-RCNN.
+- The Area of Overlap between the cars bounding points and the previously identified ROI(parking slots) will then be calculated and used to determine the ocupancy of said lot.
+- The cars mask can be used to make this more accurate instead of the cars bbounding box.
+
+## AI Segmentation
+
+- Low accuracy, work in progress.
