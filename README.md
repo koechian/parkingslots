@@ -18,6 +18,7 @@
 - The cars will then be identified using Mask-RCNN.
 - The Area of Overlap between the cars bounding points and the previously identified ROI(parking slots) will then be calculated and used to determine the ocupancy of said lot.
 - The cars mask can be used to make this more accurate instead of the cars bbounding box.
+  -Pickle is used to store the values
 
 ## AI Segmentation
 
