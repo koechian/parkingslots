@@ -1,3 +1,4 @@
+from matplotlib.style import available
 import numpy as np
 import pickle
 import cv2
@@ -33,17 +34,33 @@ def process(feed):
 
 
 def checkSlot(processed):
+    availableSlots = 0
     for nd in nodePos:
         x, y = nd
         slot = processed[y : y + HEIGHT, x : x + WIDTH]
-
-        cv2.imshow(str(x * y), slot)
 
         # counting all non-zero pixels
         count = cv2.countNonZero(slot)
         cvzone.putTextRect(
             feed, str(count), (x, y + HEIGHT - 10), scale=1, thickness=2, offset=0
         )
+
+        if count < 900:
+            color = [0, 255, 0]
+            availableSlots += 1
+        else:
+            color = [0, 0, 255]
+
+        cv2.rectangle(feed, (x, y), (x + WIDTH, y + HEIGHT), color, 2)
+    cvzone.putTextRect(
+        feed,
+        f"free:{availableSlots}/{len(nodePos)}",
+        (50, 50),
+        scale=2,
+        thickness=2,
+        offset=3,
+        colorR=[0, 255, 0],
+    )
 
 
 cap = cv2.VideoCapture(VIDEO_LOCATION)
@@ -58,10 +75,6 @@ while True:
     # image processing
     checkSlot(process(feed))
 
-    for x in nodePos:
-        cv2.rectangle(feed, x, (x[0] + WIDTH, x[1] + HEIGHT), [0, 255, 0], 2)
-
     cv2.imshow("Video Feed", feed)
-    # cv2.imshow("Processed", process(feed))
 
     cv2.waitKey(10)

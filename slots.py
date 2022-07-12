@@ -5,6 +5,7 @@ import pickle
 
 WIDTH, HEIGHT = 107, 48
 
+
 try:
     with open("slots.p", "rb") as f:
         nodePos = pickle.load(f)
