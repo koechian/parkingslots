@@ -1,4 +1,3 @@
-from matplotlib.style import available
 import numpy as np
 import pickle
 import cv2
@@ -10,7 +9,14 @@ from slots import *
 with open("slots.p", "rb") as f:
     nodePos = pickle.load(f)
 
+
+# creating a list of nums to be used as the dict keys
+nums = []
 VIDEO_LOCATION = str(Path("data/overhead_parking.mp4"))
+
+
+def calcDistance(feed):
+    pass
 
 
 def process(feed):
@@ -41,25 +47,29 @@ def checkSlot(processed):
 
         # counting all non-zero pixels
         count = cv2.countNonZero(slot)
-        cvzone.putTextRect(
-            feed, str(count), (x, y + HEIGHT - 10), scale=1, thickness=2, offset=0
-        )
+        # cvzone.putTextRect(
+        #     feed, str(count), (x, y + HEIGHT - 10), scale=1, thickness=2, offset=0
+        # )
 
         if count < 900:
+            # append the slot to a dict with [index,distance]
             color = [0, 255, 0]
             availableSlots += 1
+            thickness = 2
         else:
-            color = [0, 0, 255]
+            color = [255, 255, 255]
+            thickness = 1
 
-        cv2.rectangle(feed, (x, y), (x + WIDTH, y + HEIGHT), color, 2)
+        cv2.rectangle(feed, (x, y), (x + WIDTH, y + HEIGHT), color, thickness)
     cvzone.putTextRect(
         feed,
-        f"free:{availableSlots}/{len(nodePos)}",
+        f"Free:{availableSlots}/{len(nodePos)}",
         (50, 50),
         scale=2,
-        thickness=2,
+        thickness=1,
         offset=3,
-        colorR=[0, 255, 0],
+        colorR=[255, 255, 255],
+        colorT=[0, 0, 0],
     )
 
 
@@ -74,6 +84,7 @@ while True:
 
     # image processing
     checkSlot(process(feed))
+    drawGate(feed)
 
     cv2.imshow("Video Feed", feed)
 
