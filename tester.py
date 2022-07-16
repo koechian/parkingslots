@@ -38,5 +38,14 @@ import cv2
 with open("compDict.p", "rb") as f:
     Dict = pickle.load(f)
 
-for x in Dict.values():
-    print(x)
+
+minDistance = min(d["distance"] for d in Dict.values())
+
+# Dict[2]["occupied"] = False
+
+print(minDistance)
+suggested = [
+    k
+    for k in Dict
+    if (Dict[k]["distance"] == minDistance and Dict[k]["occupied"] == False)
+]

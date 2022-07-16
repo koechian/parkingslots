@@ -40,6 +40,8 @@ def process(feed):
 
 
 def checkSlot(processed):
+    emptyLots = []
+
     availableSlots = 0
     for x in Dict.values():
         a, b = x["pos"]
@@ -52,19 +54,34 @@ def checkSlot(processed):
         # cvzone.putTextRect(
         #     feed, str(count), (a + 10, b + 10), 1, 1, (255, 255, 255), (0, 0, 0)
         # )
-        print(Dict)
         if count < 800:
             # change the slot occupancy if empty
             color = [0, 255, 0]
             availableSlots += 1
             thickness = 2
             x["occupied"] = False
-            print(Dict)
         else:
+            x["occupied"] = True
             color = [255, 255, 255]
             thickness = 1
 
+        # print(Dict)
+
         cv2.rectangle(feed, (a, b), (a + WIDTH, b + HEIGHT), color, thickness)
+
+        if x["occupied"] == False:
+
+            # get distances of the empty lots and store them in a list
+            emptyLots.append(x["distance"])
+
+            # return minimum value
+            minDistance = min(emptyLots)
+
+            # print(minDistance)
+        # get key of closest empty lot
+    suggested = [k for k in Dict if (Dict[k]["distance"] == minDistance)]
+
+    print(emptyLots)
 
     cvzone.putTextRect(
         feed,
@@ -73,6 +90,19 @@ def checkSlot(processed):
         scale=2,
         thickness=1,
         offset=3,
+        colorR=[255, 255, 255],
+        colorT=[0, 0, 0],
+    )
+    # print(suggested)
+
+    # Show nearest unoccupied slot
+    cvzone.putTextRect(
+        feed,
+        f"Nearest Lot: {str(suggested[0])}",
+        (800, 100),
+        scale=0.7,
+        thickness=1,
+        offset=2,
         colorR=[255, 255, 255],
         colorT=[0, 0, 0],
     )
@@ -119,12 +149,12 @@ while True:
             colorR=[255, 255, 255],
             colorT=[0, 0, 0],
         )
+
         count += 1
 
-    # image processing
+        # show the nearest unoccupied lot
 
     cv2.imshow("Parking Lot Feed", feed)
-
     key = cv2.waitKey(10)
 
     if key == 27:
