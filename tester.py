@@ -1,51 +1,25 @@
-import pickle
 import cv2
+from pathlib import Path
+import numpy as np
 
-# import math
-# from platform import node
-
-# WIDTH, HEIGHT = 107, 48
-# GATE = (42, 13)
-
-# with open("slots.p", "rb") as f:
-#     nodes = pickle.load(f)
-
-# index = []
-# index.extend(range(1, len(nodes)))
-
-# i = 1
-# Dict = dict()
-
-# for x in nodes:
-
-#     Dict[i] = {
-#         "pos": x,
-#         "distance": abs(math.floor(x[0] + (WIDTH / 2)) - GATE[0])
-#         + abs((math.floor(x[1] + (HEIGHT / 2)) - GATE[1])),
-#         "occupied": True,
-#     }
-
-#     if i != 69:
-#         i = i + 1
-#     else:
-#         break
-
-# # Dict created after the slots have been loaded into node pos
-
-# with open("data/slots.p", "rb") as f:
-#     Dict = pickle.load(f)
-
-with open("compDict.p", "rb") as f:
-    Dict = pickle.load(f)
+cap = cv2.imread(str(Path("data/overhead_parking.png")))
 
 
-minDistance = min(d["distance"] for d in Dict.values())
+while True:
+    disp = cv2.GaussianBlur((cv2.cvtColor(cap, cv2.COLOR_BGR2GRAY)), (3, 3), 1)
 
-# Dict[2]["occupied"] = False
+    threshold = cv2.adaptiveThreshold(
+        disp, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 25, 16
+    )
+    median = cv2.medianBlur(threshold, 5)
 
-print(minDistance)
-suggested = [
-    k
-    for k in Dict
-    if (Dict[k]["distance"] == minDistance and Dict[k]["occupied"] == False)
-]
+    kernels = np.ones((3, 3), np.uint8)
+
+    dilate = cv2.dilate(median, kernels, iterations=1)
+
+    cv2.imshow("Feed", dilate)
+
+    key = cv2.waitKey(1)
+
+    if key == 27:
+        break

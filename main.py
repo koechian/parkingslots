@@ -36,6 +36,7 @@ def process(feed):
     kernels = np.ones((3, 3), np.uint8)
 
     dilate = cv2.dilate(median, kernels, iterations=1)
+
     return dilate
 
 
@@ -81,8 +82,6 @@ def checkSlot(processed):
         # get key of closest empty lot
     suggested = [k for k in Dict if (Dict[k]["distance"] == minDistance)]
 
-    print(emptyLots)
-
     cvzone.putTextRect(
         feed,
         f"Free:{availableSlots}/{len(Dict)}",
@@ -99,8 +98,8 @@ def checkSlot(processed):
     cvzone.putTextRect(
         feed,
         f"Nearest Lot: {str(suggested[0])}",
-        (800, 100),
-        scale=0.7,
+        (800, 60),
+        scale=2,
         thickness=1,
         offset=2,
         colorR=[255, 255, 255],
