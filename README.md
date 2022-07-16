@@ -1,24 +1,34 @@
 # Identifying and tracking Parking Lot Status using Computer Vision.
 
-1. Parking Slot Identification.
+1. Parking Slot Segmentation.
    - Use manual Segmentation to mark Regions of Intrest.(Parking slots)
-   - Upgrade to Image based Segmentation using Active Contours
-   - Canny edge detection was used to detect the straight lines in parking lots.
+     -A parking Slot is defined as a single point(x,y) plus the width and height of a lot.
 2. Car Detection.
-   - Define a vehicle using 4 bounds.-[MASK RCNN]
-   - Object Classification. (Cars must be distinguishable from other objects)
+
+   - MASK RCNN did not work as expected. Given that the program is supposed to work on low cost hardware, image processing was preffered.
+   - Humans and cars must be distingiushable.
+   - Non-Zero pixels are counted after the image/feed has gone through multiple iterations of processing.
+     - Feed was converted to Grayscale.
+       ![Grayscale Image](/images/grayscale.png?raw=true "Feed Converted to Grayscale")
+     - A Gaussian Blur was then applied to remove noise.
+       ![After Blur](/images/gaussianblur.png?raw=true "Blur Applied to reduce visual noise")
+     - Feed was converted to a Binary Image Map using an Adaptive Threshold.
+       ![Binary Mapped Image](/images/binarymap.png?raw=true "Converted Image")
+     - The image still has a lot of noise(The small dotted lines and spots that can be seen in the picture above) and Median blur was then used on to further remove these spots.
+       ![Binary Mapped Image](/images/medianblur.png?raw=true "Converted Image")
+     - One pass of dilation was then applied to the feed. (This basically causes the brighter spots in an image increase in size. See [OpenCv: Eroding and Dilating](https://docs.opencv.org/3.4/db/df6/tutorial_erosion_dilatation.html))
+       ![Image after Dilation](/images/dilation.png?raw=true "Dilated Image")
+     - Given that the image was converted to a binary map, the non-zero pixels will be the white ones. We can then count how many of these pixels exist in a bounding box(parking lot). This will be used to determine the status of a lot.
+
 3. Slot Occupancy Tracking.
-   - A slot's status is updated in memory.
-   - Parking lot status(Current Car count vs Total available slots)
-   - Directions to available space as a feature.
+   - Slot position,status and distance from a common origin(gate) is stored in a Nested Dictionary to allow for fast lookup times. The dictionary is then pickled to allow for data persistance.
+   - Parking lot status(Current Car count vs Total available slots) is tracked throughout.
+   - Directions to available the nearest available space is shown in refrence to the gate.
 
 ## Manual Segmentation
 
-- Segmentor.py is used to manually select parking slots in a video feed.
-- The cars will then be identified using Mask-RCNN.
-- The Area of Overlap between the cars bounding points and the previously identified ROI(parking slots) will then be calculated and used to determine the ocupancy of said lot.
-- The cars mask can be used to make this more accurate instead of the cars bbounding box.
-  -Pickle is used to store the values
+- The Width and Length of parking lots are calculated manually.
+- Slots.py is used to manually select parking slots in a video feed.
 
 ## AI Segmentation
 
