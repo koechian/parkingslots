@@ -1,31 +1,42 @@
 import pickle
-import math
-from platform import node
+import cv2
 
-WIDTH, HEIGHT = 107, 48
-GATE = (42, 13)
+# import math
+# from platform import node
 
-with open("slots.p", "rb") as f:
-    nodes = pickle.load(f)
+# WIDTH, HEIGHT = 107, 48
+# GATE = (42, 13)
 
-index = []
-index.extend(range(1, len(nodes)))
+# with open("slots.p", "rb") as f:
+#     nodes = pickle.load(f)
 
-i = 1
-Dict = dict()
+# index = []
+# index.extend(range(1, len(nodes)))
 
-for x in nodes:
+# i = 1
+# Dict = dict()
 
-    Dict[i] = {
-        "pos": x,
-        "distance": abs(math.floor(x[0] + (WIDTH / 2)) - GATE[0])
-        + abs((math.floor(x[1] + (HEIGHT / 2)) - GATE[1])),
-        "occupied": True,
-    }
+# for x in nodes:
 
-    if i != 69:
-        i = i + 1
-    else:
-        break
+#     Dict[i] = {
+#         "pos": x,
+#         "distance": abs(math.floor(x[0] + (WIDTH / 2)) - GATE[0])
+#         + abs((math.floor(x[1] + (HEIGHT / 2)) - GATE[1])),
+#         "occupied": True,
+#     }
 
-# Dict created after the slots have been loaded into node pos
+#     if i != 69:
+#         i = i + 1
+#     else:
+#         break
+
+# # Dict created after the slots have been loaded into node pos
+
+# with open("data/slots.p", "rb") as f:
+#     Dict = pickle.load(f)
+
+with open("compDict.p", "rb") as f:
+    Dict = pickle.load(f)
+
+for x in Dict.values():
+    print(x)

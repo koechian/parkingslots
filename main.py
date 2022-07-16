@@ -1,22 +1,21 @@
+import sys
 import numpy as np
 import pickle
 import cv2
 import cvzone
-
 from pathlib import Path
-from slots import *
 
-with open("slots.p", "rb") as f:
-    nodePos = pickle.load(f)
-
-
-# creating a list of nums to be used as the dict keys
-nums = []
+# Global vars
 VIDEO_LOCATION = str(Path("data/overhead_parking.mp4"))
+WIDTH, HEIGHT = 107, 48
 
 
-def calcDistance(feed):
-    pass
+try:
+    with open("compDict.p", "rb") as x:
+        mainDict = pickle.load(x)
+        Dict = mainDict
+except FileNotFoundError:
+    sys.exit("Run Slots.py first to generate slots to watch")
 
 
 def process(feed):
@@ -35,35 +34,41 @@ def process(feed):
     # stretching the pixels in the image to make it easier to find bounds
 
     kernels = np.ones((3, 3), np.uint8)
+
     dilate = cv2.dilate(median, kernels, iterations=1)
     return dilate
 
 
 def checkSlot(processed):
     availableSlots = 0
-    for nd in nodePos:
-        x, y = nd
-        slot = processed[y : y + HEIGHT, x : x + WIDTH]
+    for x in Dict.values():
+        a, b = x["pos"]
+        slot = processed[b : b + HEIGHT, a : a + WIDTH]
 
         # counting all non-zero pixels
         count = cv2.countNonZero(slot)
-        # cvzone.putTextRect(
-        #     feed, str(count), (x, y + HEIGHT - 10), scale=1, thickness=2, offset=0
-        # )
 
-        if count < 900:
-            # append the slot to a dict with [index,distance]
+        # showing non-zero pixel count
+        # cvzone.putTextRect(
+        #     feed, str(count), (a + 10, b + 10), 1, 1, (255, 255, 255), (0, 0, 0)
+        # )
+        print(Dict)
+        if count < 800:
+            # change the slot occupancy if empty
             color = [0, 255, 0]
             availableSlots += 1
             thickness = 2
+            x["occupied"] = False
+            print(Dict)
         else:
             color = [255, 255, 255]
             thickness = 1
 
-        cv2.rectangle(feed, (x, y), (x + WIDTH, y + HEIGHT), color, thickness)
+        cv2.rectangle(feed, (a, b), (a + WIDTH, b + HEIGHT), color, thickness)
+
     cvzone.putTextRect(
         feed,
-        f"Free:{availableSlots}/{len(nodePos)}",
+        f"Free:{availableSlots}/{len(Dict)}",
         (50, 50),
         scale=2,
         thickness=1,
@@ -76,16 +81,51 @@ def checkSlot(processed):
 cap = cv2.VideoCapture(VIDEO_LOCATION)
 
 while True:
+    count = 1
     # looping the video
     if cap.get(cv2.CAP_PROP_POS_FRAMES) == cap.get(cv2.CAP_PROP_FRAME_COUNT):
         cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
     _, feed = cap.read()
+    checkSlot(process(feed))
+
+    for x in Dict.values():
+        # lot indexes
+        cvzone.putTextRect(
+            feed,
+            str(count),
+            (
+                x["pos"][0] + 5,
+                x["pos"][1] + 15,
+            ),
+            scale=1,
+            thickness=1,
+            offset=2,
+            colorR=[255, 255, 255],
+            colorT=[0, 0, 0],
+        )
+
+        # distance to gate
+        cvzone.putTextRect(
+            feed,
+            f"Distance: {x['distance']}",
+            (
+                x["pos"][0] + 35,
+                x["pos"][1] + 45,
+            ),
+            scale=0.7,
+            thickness=1,
+            offset=2,
+            colorR=[255, 255, 255],
+            colorT=[0, 0, 0],
+        )
+        count += 1
 
     # image processing
-    checkSlot(process(feed))
-    drawGate(feed)
 
-    cv2.imshow("Video Feed", feed)
+    cv2.imshow("Parking Lot Feed", feed)
 
-    cv2.waitKey(10)
+    key = cv2.waitKey(10)
+
+    if key == 27:
+        break
