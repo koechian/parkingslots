@@ -21,9 +21,17 @@
      - Given that the image was converted to a binary map, the non-zero pixels will be the white ones. We can then count how many of these pixels exist in a bounding box(parking lot). This will be used to determine the status of a lot.
 
 3. Slot Occupancy Tracking.
+
    - Slot position,status and distance from a common origin(gate) is stored in a Nested Dictionary to allow for fast lookup times. The dictionary is then pickled to allow for data persistance.
    - Parking lot status(Current Car count vs Total available slots) is tracked throughout.
    - Directions to available the nearest available space is shown in refrence to the gate.
+
+4. Graphical User Interfaces
+
+- Implement a means through which the drivers can view the number of slots available and be informed of the nearest available slot.
+  - This is to be done using the Eel Library.
+    -Multithreaded to allow the Image Processing and the GUI to be viewed concurrently.
+    -Implement a means for the lot manager to view current occupied slots.
 
 ## Manual Segmentation
 

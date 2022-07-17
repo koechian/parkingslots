@@ -1,12 +1,16 @@
 import sys
+from matplotlib.style import available
 import numpy as np
 import pickle
 import cv2
 import cvzone
 from pathlib import Path
+import eel
+import threading
+from gui import *
 
 # Global vars
-VIDEO_LOCATION = str(Path("data/overhead_parking.mp4"))
+VIDEO_LOCATION = str(Path("data/reversed.mp4"))
 WIDTH, HEIGHT = 107, 48
 
 
@@ -42,7 +46,6 @@ def process(feed):
 
 def checkSlot(processed):
     emptyLots = []
-
     availableSlots = 0
     for x in Dict.values():
         a, b = x["pos"]
@@ -107,7 +110,27 @@ def checkSlot(processed):
     )
 
 
+def renderer():
+    eel.init("frontend")
+    eel.start("direction.html", size=(1000, 600))
+
+
+@eel.expose
+def comm(param):
+    return availableSlots
+
+
+# TODO send number oof available slots to front end
+
+
 cap = cv2.VideoCapture(VIDEO_LOCATION)
+
+
+t1 = threading.Thread(
+    target=renderer,
+)
+t1.start()
+
 
 while True:
     count = 1
