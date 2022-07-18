@@ -7,19 +7,21 @@
     <link rel="stylesheet" href="crt.css" />
     <link rel="stylesheet" href="style.css" />
     <title>Parking Lots System</title>
-    <script src="index.js"></script>
     <script src="../eel.js"></script>
   </head>
-  <body>
-    <div class="crt">
-      <div class="spaces">
-        <h1>Parking Spaces: 21/60</h1>
-      </div>
-      <div class="nearest">
-        <h2>Nearest Space:</h2>
-        <h1>Lot 22</h1>
-        <input type="button" value="Button" onclick="getData()" />
-      </div>
+  <body class="crt">
+    <div class="spaces">
+      <h1>
+        Parking Spaces:
+        <span id="available">Tester</span>
+        /<span id="total"></span>
+      </h1>
+    </div>
+    <div class="nearest">
+      <h2>Nearest Space:</h2>
+      <h1>Lot <span id="suggested"></span></h1>
     </div>
   </body>
+  <script src="jquery.js"></script>
+  <script src="index.js"></script>
 </html>

@@ -7,7 +7,6 @@ import cvzone
 from pathlib import Path
 import eel
 import threading
-from gui import *
 
 # Global vars
 VIDEO_LOCATION = str(Path("data/reversed.mp4"))
@@ -95,6 +94,10 @@ def checkSlot(processed):
         colorR=[255, 255, 255],
         colorT=[0, 0, 0],
     )
+
+    # Call the js function to update the slots.
+    eel.myFunc(int(availableSlots), int(len(Dict)), int(suggested[0]))
+
     # print(suggested)
 
     # Show nearest unoccupied slot
@@ -110,26 +113,24 @@ def checkSlot(processed):
     )
 
 
+# front end rendering using eel on a separate thread
 def renderer():
-    eel.init("frontend")
-    eel.start("direction.html", size=(1000, 600))
-
-
-@eel.expose
-def comm(param):
-    return availableSlots
-
-
-# TODO send number oof available slots to front end
+    eel.start(
+        "direction.html",
+        size=(1000, 800),
+    )
 
 
 cap = cv2.VideoCapture(VIDEO_LOCATION)
+eel.init("frontend")
 
 
 t1 = threading.Thread(
     target=renderer,
 )
 t1.start()
+
+# eel.spawn(renderer)
 
 
 while True:

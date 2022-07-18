@@ -1,13 +1,18 @@
 import eel
+import threading
 
 eel.init("frontend")
 
 
-@eel.expose
-def tester(param):
-    print("Hello World", param)
+def gui():
+    eel.start(
+        "direction.html",
+        size=(600, 600),
+    )
 
-    return "Hello Dunia"
+
+t1 = threading.Thread(target=gui)
+t1.start()
 
 
-eel.start("direction.html", size=(1920, 1080))
+eel.myFunc(1, 2)
