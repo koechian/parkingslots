@@ -31,7 +31,6 @@
 - Implement a means through which the drivers can view the number of slots available and be informed of the nearest available slot.
   - This is to be done using the Eel Library.
     -Multithreaded to allow the Image Processing and the GUI to be viewed concurrently.
-    -Implement a means for the lot manager to view current occupied slots.
 
 ## Manual Segmentation
 
